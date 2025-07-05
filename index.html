@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Distribuidor de Entregas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      border: 2px solid #fca311;
+      border-radius: 15px;
+      background-color: #fff;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    button {
+      background-color: #fca311;
+      color: #000;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #ffb733;
+    }
+    .resultado a {
+      display: block;
+      margin-bottom: 10px;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <h2>Distribuição de Entregas para Motoboys</h2>
+
+  <label for="pacotes">Quantidade Total de Pacotes:</label>
+  <input type="number" id="pacotes" placeholder="Ex: 12" />
+
+  <label for="motoboys">Motoboys (nome, número com DDD e prioridade):</label>
+  <textarea id="motoboys" rows="6" placeholder="Exemplo:
+João,55999999999,1
+Maria,55888888888,2
+Carlos,55777777777,3"></textarea>
+
+  <button onclick="distribuir()">Distribuir e Gerar Mensagens</button>
+
+  <div id="resultado" class="resultado"></div>
+
+  <script>
+    function distribuir() {
+      const totalPacotes = parseInt(document.getElementById("pacotes").value);
+      const linhas = document.getElementById("motoboys").value.trim().split("\n");
+      const motoboys = linhas.map(linha => {
+        const [nome, numero, prioridade] = linha.split(",");
+        return { nome: nome.trim(), numero: numero.trim(), prioridade: parseInt(prioridade) };
+      }).sort((a, b) => a.prioridade - b.prioridade);
+
+      if (motoboys.length === 0 || isNaN(totalPacotes) || totalPacotes <= 0) {
+        alert("Preencha todos os campos corretamente.");
+        return;
+      }
+
+      const porMotoboy = Math.floor(totalPacotes / motoboys.length);
+      let sobra = totalPacotes % motoboys.length;
+
+      let html = `<h3>Mensagens Geradas:</h3>`;
+
+      motoboys.forEach(motoboy => {
+        let qtd = porMotoboy + (sobra > 0 ? 1 : 0);
+        if (sobra > 0) sobra--;
+
+        const mensagem = `Olá ${motoboy.nome}, você foi selecionado para a rota do dia. Ficará responsável por ${qtd} pacotes. Boa entrega!`;
+        const url = `https://wa.me/${motoboy.numero}?text=${encodeURIComponent(mensagem)}`;
+
+        html += `<a href="${url}" target="_blank">Enviar para ${motoboy.nome} (${motoboy.numero})</a>`;
+      });
+
+      document.getElementById("resultado").innerHTML = html;
+    }
+  </script>
+</body>
+</html>
