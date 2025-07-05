@@ -8,17 +8,17 @@
     body {
       font-family: Arial, sans-serif;
       max-width: 600px;
-      margin: 40px auto;
+      margin: 20px auto;
       padding: 20px;
       border: 2px solid #fca311;
       border-radius: 15px;
       background-color: #fff;
     }
-    input, button {
+    input[type="number"], button {
       width: 100%;
-      padding: 10px;
+      padding: 15px;
       margin: 10px 0;
-      font-size: 16px;
+      font-size: 18px;
     }
     button {
       background-color: #fca311;
@@ -26,17 +26,25 @@
       border: none;
       cursor: pointer;
       font-weight: bold;
+      border-radius: 10px;
     }
     button:hover {
       background-color: #ffb733;
     }
     .motoboy {
-      margin: 5px 0;
+      margin: 10px 0;
+      font-size: 18px;
     }
     .resultado a {
       display: block;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       color: green;
+      font-weight: bold;
+    }
+    @media (max-width: 600px) {
+      input, button {
+        font-size: 20px;
+      }
     }
   </style>
 </head>
@@ -46,17 +54,16 @@
   <label for="pacotes">Quantidade Total de Pacotes:</label>
   <input type="number" id="pacotes" placeholder="Ex: 12" />
 
-  <h3>Selecione os motoboys:</h3>
-  <div id="motoboy-list">
-    <!-- Os motoboys fixos ficam aqui -->
-  </div>
+  <h3>Motoboys disponíveis:</h3>
+  <button onclick="selecionarTodos()">🕹️ Selecionar Todos</button>
+  <div id="motoboy-list"></div>
 
-  <button onclick="distribuir()">Distribuir e Gerar Mensagens</button>
+  <button onclick="distribuir()">📤 Distribuir e Gerar Mensagens</button>
 
   <div id="resultado" class="resultado"></div>
 
   <script>
-    // Lista fixa de motoboys com prioridade
+    // Lista fixa de motoboys
     const motoboys = [
       { nome: "João", numero: "55999999999", prioridade: 1 },
       { nome: "Maria", numero: "55888888888", prioridade: 2 },
@@ -65,19 +72,48 @@
       { nome: "Ana", numero: "55555555555", prioridade: 5 }
     ];
 
-    // Gera os checkboxes automaticamente
+    // Salva seleção no navegador
+    function salvarSelecionados() {
+      const selecionados = motoboys.map((_, i) => {
+        const check = document.getElementById("motoboy" + i);
+        return check.checked;
+      });
+      localStorage.setItem("motoboysSelecionados", JSON.stringify(selecionados));
+    }
+
+    // Carrega seleção salva
+    function carregarSelecionados() {
+      const salvos = JSON.parse(localStorage.getItem("motoboysSelecionados")) || [];
+      salvos.forEach((val, i) => {
+        const check = document.getElementById("motoboy" + i);
+        if (check) check.checked = val;
+      });
+    }
+
+    // Gera a lista de checkboxes no carregamento
     window.onload = () => {
       const container = document.getElementById("motoboy-list");
       motoboys.sort((a, b) => a.prioridade - b.prioridade).forEach((m, index) => {
         container.innerHTML += `
           <div class="motoboy">
-            <input type="checkbox" id="motoboy${index}" value="${index}" />
+            <input type="checkbox" id="motoboy${index}" value="${index}" onchange="salvarSelecionados()"/>
             <label for="motoboy${index}">${m.nome} (prioridade ${m.prioridade})</label>
           </div>
         `;
       });
+      carregarSelecionados();
     };
 
+    // Seleciona todos os motoboys
+    function selecionarTodos() {
+      motoboys.forEach((_, i) => {
+        const check = document.getElementById("motoboy" + i);
+        if (check) check.checked = true;
+      });
+      salvarSelecionados();
+    }
+
+    // Faz a distribuição
     function distribuir() {
       const totalPacotes = parseInt(document.getElementById("pacotes").value);
       const selecionados = [];
