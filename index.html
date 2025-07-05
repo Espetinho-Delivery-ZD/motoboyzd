@@ -7,13 +7,15 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      max-width: 600px;
-      margin: 20px auto;
+      max-width: 700px;
+      margin: 0 auto;
       padding: 20px;
-      border: 2px solid #fca311;
-      border-radius: 15px;
-      background-color: #fff;
+      background-color: #1c1c1c;
+      color: #f0f0f0;
+    }
+    header {
       text-align: center;
+      margin-bottom: 20px;
     }
     header img {
       width: 100%;
@@ -22,38 +24,56 @@
     }
     header h1 {
       margin: 10px 0;
-      font-size: 24px;
+      font-size: 28px;
       color: #c1121f;
     }
+    header p {
+      font-size: 16px;
+      color: #aaaaaa;
+    }
+
     input[type="number"], button {
       width: 100%;
       padding: 15px;
       margin: 10px 0;
       font-size: 18px;
+      border-radius: 8px;
+      border: none;
+    }
+    input[type="number"] {
+      background-color: #333;
+      color: #fff;
     }
     button {
-      background-color: #fca311;
-      color: #000;
-      border: none;
-      cursor: pointer;
+      background-color: #c1121f;
+      color: #fff;
       font-weight: bold;
-      border-radius: 10px;
+      cursor: pointer;
     }
     button:hover {
-      background-color: #ffb733;
+      background-color: #ff4e00;
     }
     .motoboy {
       margin: 10px 0;
       font-size: 18px;
       text-align: left;
     }
+    .motoboy input {
+      transform: scale(1.2);
+      margin-right: 10px;
+    }
     .resultado a {
       display: block;
       margin-bottom: 12px;
-      color: green;
+      color: #00ff88;
       font-weight: bold;
       text-align: left;
     }
+    .resultado h3 {
+      margin-top: 30px;
+      color: #ffffff;
+    }
+
     @media (max-width: 600px) {
       input, button {
         font-size: 20px;
