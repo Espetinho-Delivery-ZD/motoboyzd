@@ -31,37 +31,15 @@
       font-size: 16px;
       color: #aaaaaa;
     }
-
-   /* Estilo apenas para o input de pacotes */
-input[type="number"] {
-  width: 60%;              /* Diminui o tamanho */
-  padding: 10px;
-  font-size: 16px;
-  background-color: #333;
-  color: #fff;
-  border-radius: 8px;
-  border: none;
-  display: block;
-  margin: 10px auto;       /* Centraliza */
-}
-
-/* Estilo separado para os botões */
-button {
-  width: 100%;
-  padding: 15px;
-  margin: 10px 0;
-  font-size: 18px;
-  background-color: #c1121f;
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-  border: none;
-  border-radius: 10px;
-}
-button:hover {
-  background-color: #ff4e00;
-}
-    input[type="number"] {
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+    }
+    input {
       background-color: #333;
       color: #fff;
     }
@@ -74,31 +52,15 @@ button:hover {
     button:hover {
       background-color: #ff4e00;
     }
-    .motoboy {
-      margin: 10px 0;
-      font-size: 18px;
-      text-align: left;
-    }
-    .motoboy input {
-      transform: scale(1.2);
-      margin-right: 10px;
-    }
     .resultado a {
       display: block;
-      margin-bottom: 12px;
+      margin: 10px 0;
       color: #00ff88;
       font-weight: bold;
-      text-align: left;
     }
     .resultado h3 {
       margin-top: 30px;
       color: #ffffff;
-    }
-
-    @media (max-width: 600px) {
-      input, button {
-        font-size: 20px;
-      }
     }
   </style>
 </head>
@@ -110,14 +72,13 @@ button:hover {
     <p>Serviço de Entrega</p>
   </header>
 
-  <label for="pacotes">Quantidade Total de Pacotes:</label>
+  <label for="motoboysCount">Quantos motoboys para hoje?</label>
+  <input type="number" id="motoboysCount" placeholder="Ex: 3" />
+
+  <label for="pacotes">Quantidade total de pacotes:</label>
   <input type="number" id="pacotes" placeholder="Ex: 12" />
 
-  <h3>Motoboys disponíveis:</h3>
-  <button onclick="selecionarTodos()">🕹️ Selecionar Todos</button>
-  <div id="motoboy-list"></div>
-
-  <button onclick="distribuir()">📤 Distribuir e Gerar Mensagens</button>
+  <button onclick="sortearMotoboys()">🎯 Sortear e Distribuir</button>
 
   <div id="resultado" class="resultado"></div>
 
@@ -127,75 +88,56 @@ button:hover {
       { nome: "Maria", numero: "55888888888", prioridade: 2 },
       { nome: "Carlos", numero: "55777777777", prioridade: 3 },
       { nome: "Pedro", numero: "55666666666", prioridade: 4 },
-      { nome: "Ana", numero: "55555555555", prioridade: 5 }
+      { nome: "Ana", numero: "55555555555", prioridade: 5 },
+      { nome: "Ricardo", numero: "55444444444", prioridade: 6 },
+      { nome: "Bruna", numero: "55333333333", prioridade: 7 }
     ];
 
-    function salvarSelecionados() {
-      const selecionados = motoboys.map((_, i) => {
-        const check = document.getElementById("motoboy" + i);
-        return check.checked;
-      });
-      localStorage.setItem("motoboysSelecionados", JSON.stringify(selecionados));
+    function embaralhar(lista) {
+      for (let i = lista.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [lista[i], lista[j]] = [lista[j], lista[i]];
+      }
+      return lista;
     }
 
-    function carregarSelecionados() {
-      const salvos = JSON.parse(localStorage.getItem("motoboysSelecionados")) || [];
-      salvos.forEach((val, i) => {
-        const check = document.getElementById("motoboy" + i);
-        if (check) check.checked = val;
-      });
-    }
-
-    window.onload = () => {
-      const container = document.getElementById("motoboy-list");
-      motoboys.sort((a, b) => a.prioridade - b.prioridade).forEach((m, index) => {
-        container.innerHTML += `
-          <div class="motoboy">
-            <input type="checkbox" id="motoboy${index}" value="${index}" onchange="salvarSelecionados()"/>
-            <label for="motoboy${index}">${m.nome} (prioridade ${m.prioridade})</label>
-          </div>
-        `;
-      });
-      carregarSelecionados();
-    };
-
-    function selecionarTodos() {
-      motoboys.forEach((_, i) => {
-        const check = document.getElementById("motoboy" + i);
-        if (check) check.checked = true;
-      });
-      salvarSelecionados();
-    }
-
-    function distribuir() {
+    function sortearMotoboys() {
+      const qtdMotoboys = parseInt(document.getElementById("motoboysCount").value);
       const totalPacotes = parseInt(document.getElementById("pacotes").value);
-      const selecionados = [];
 
-      motoboys.forEach((m, i) => {
-        const checkbox = document.getElementById("motoboy" + i);
-        if (checkbox && checkbox.checked) {
-          selecionados.push(m);
-        }
-      });
-
-      if (selecionados.length === 0 || isNaN(totalPacotes) || totalPacotes <= 0) {
-        alert("Selecione ao menos 1 motoboy e defina um número de pacotes válido.");
+      if (isNaN(qtdMotoboys) || qtdMotoboys <= 0 || isNaN(totalPacotes) || totalPacotes <= 0) {
+        alert("Preencha corretamente os campos de motoboys e pacotes.");
         return;
       }
 
-      const porMotoboy = Math.floor(totalPacotes / selecionados.length);
-      let sobra = totalPacotes % selecionados.length;
-      let html = "<h3>Mensagens Geradas:</h3>";
+      const prioridadeAlta = motoboys.filter(m => m.prioridade <= 3);
+      const demais = motoboys.filter(m => m.prioridade > 3);
 
-      selecionados.forEach((m) => {
+      const escolhidos = [];
+
+      const sorteadosPrioridade = embaralhar([...prioridadeAlta]).slice(0, Math.min(2, qtdMotoboys));
+      escolhidos.push(...sorteadosPrioridade);
+
+      if (escolhidos.length < qtdMotoboys) {
+        const faltam = qtdMotoboys - escolhidos.length;
+        const restante = embaralhar([...demais]).slice(0, faltam);
+        escolhidos.push(...restante);
+      }
+
+      const porMotoboy = Math.floor(totalPacotes / escolhidos.length);
+      let sobra = totalPacotes % escolhidos.length;
+
+      let html = "<h3>Motoboys Sorteados:</h3><ul>";
+      escolhidos.forEach((m, index) => {
         let qtd = porMotoboy + (sobra > 0 ? 1 : 0);
         if (sobra > 0) sobra--;
 
         const mensagem = `Olá ${m.nome}, você foi selecionado para a rota do dia. Ficará responsável por ${qtd} pacotes. Boa entrega!`;
         const url = `https://wa.me/${m.numero}?text=${encodeURIComponent(mensagem)}`;
 
-        html += `<a href="${url}" target="_blank">Enviar para ${m.nome} (${m.numero})</a>`;
+        html += `<li><strong>${m.nome}</strong> - ${qtd} pacotes - <a href="${url}" target="_blank">Enviar via WhatsApp</a></li>`;
       });
+      html += "</ul>";
 
       document.getElementById("resultado").innerHTML = html;
     }
