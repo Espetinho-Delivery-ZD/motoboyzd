@@ -156,7 +156,7 @@ body::before {
         let qtd = porMotoboy + (sobra > 0 ? 1 : 0);
         if (sobra > 0) sobra--;
 
-        const mensagem = `Olá ${m.nome}, foi selecionado para a rota do dia, venha até a base para separar as mercadorias.  Você  ficará responsável por ${qtd} pacotes. Boa entrega!`;
+        const mensagem = `Olá ${m.nome}, foi selecionado para a rota do dia. Você  ficará responsável por ${qtd} pacotes, venha até a base para separar as mercadoria e Boa entrega!`;
         const url = `https://wa.me/${m.numero}?text=${encodeURIComponent(mensagem)}`;
 
         html += `<li><strong>${m.nome}</strong> - ${qtd} pacotes - <a href="${url}" target="_blank">Enviar via WhatsApp</a></li>`;
